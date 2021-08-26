@@ -8,9 +8,19 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue')
   },
   {
-    path: '/ejercicio2',
-    name: 'Ejercicio 2',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Ejercicio-2.vue')
+    path: '/memo-en',
+    name: 'MEMO en',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Memo.vue')
+  },
+  {
+    path: '/memo-es',
+    name: 'MEMO es',
+    component: () => import(/* webpackChunkName: "about" */ '../views/memo-es.vue')
+  },
+  {
+    path: '/memo-pt',
+    name: 'MEMO pt',
+    component: () => import('../views/memo-pt.vue')
   }
 ]
 

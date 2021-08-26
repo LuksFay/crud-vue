@@ -1,16 +1,14 @@
 <template>
-    <div id="memo" class="container">
-        <h2>{{notita}}</h2>
-        <!-- <p>{{noteMemo}}</p> -->
+    <div>
+        <p>{{letrinhasMemo}}</p>
     </div>
 </template>
 <script>
 export default {
-    name: "Memo",
-    props:["notita"]
+    props:["letrinhasMemo"]
 }
 </script>
-<style scoped>
+<style>
 h1, h2{
         font-family: 'Azeret Mono', monospace;
     }
