@@ -1,11 +1,27 @@
 <template>
     <div class="container">
         <div>
-            <h1>Leave a MEMO</h1>
-            <div class="container memo-inputs">     
+            <h1>Leave a MEMIT</h1>
+            <div class="container memo-inputs"> 
+
+
                     <input type="text" name="Memo title"  placeholder="Title" maxlength="27" v-model="writeMemo">
-                    <textarea cols="25" rows="5" maxlength="280" v-model="writeMemoBody" placeholder="Body"></textarea>  
-                    <button @click="createMemit">MEM-it</button>     
+                    <textarea cols="25" rows="5" placeholder="Body" maxlength="280" v-model="writeMemoBody"></textarea>  
+                    <button @click="createMemit">MEM-it</button>
+
+
+                    <div v-show="modal_directive">
+                        <div class="modal-background"></div>
+                        <div class="modal-editor container">
+                            <h1>Edit your MEMIT</h1>
+                            <input type="text" v-model="rewriteMemo">
+                            <textarea name="" id="" cols="25" rows="5" v-model="rewriteMemoBody"></textarea>
+                            <button @click="editMemit">MEM-dit</button>
+                            <button @click="modalFunction">Cancel</button>
+                        </div>    
+                    </div>   
+
+
             </div>
             <MemoResEn :previewMemo="writeMemo"/>
             <MemoResEn :previewMemo="writeMemoBody"/>
@@ -20,7 +36,8 @@
                <h3>{{ memit.title }}</h3> 
                 <p>{{ memit.body }}</p>
                 <div class="button-position">
-                    <button @click="editMemit(memit.id, memit.title, memit.body)">Edit</button>
+                    <button @click="modalFunction(memits.id, memits.title, memits.body)" >Edit</button>
+                    <!-- <button @click="editMemit(memit.id, memit.title, memit.body)">Edit</button> -->
                     <button @click.capture="deleteMemit(memit.id, memit.title)">X</button>
                 </div>
                 </div>
@@ -40,8 +57,10 @@ export default {
         return{
             writeMemo: "",
             writeMemoBody: "",
+            rewriteMemo: "",
+            rewriteMemoBody: "",
             memits: [],
-             
+            modal_directive: false
         }
     },
     methods: {
@@ -66,21 +85,22 @@ export default {
                     this.memits = saveMemit;
                 }
             },
-        editMemit(id, title, body){
+        editMemit(){
             console.log("This edit the memit");
             console.log('original memit: ', id , title, body);
             let newarray = this.memits.map(memit => {
                 if(memit.id === id){
                    return {
-                       
                        id: memit.id,
-                       title: prompt('Nuevo Titulo para el memit', title),
-                       body: prompt('Nuevo cuerpo para el memit', body)   
+                       title: this.rewriteMemo,
+                       body:  this.rewriteMemoBody 
                    }
                 }else{
                     return memit
                 }
             })
+            this.rewriteMemo='';
+            this.rewriteMemoBody='';
             console.log(newarray);
             localStorage.setItem('all-memits',JSON.stringify(newarray))
             let saveMemit = JSON.parse(localStorage.getItem('all-memits'));
@@ -89,6 +109,11 @@ export default {
                 }else{
                     this.memits = saveMemit;
                 }
+                this.modalFunction()
+        },
+        modalFunction(id, title, body){
+            this.modal_directive = !this.modal_directive
+            //setear parametros que me llegan de edit en un objeto apra luego utilizarla en editmemit()
         }   
 
     },
@@ -125,6 +150,23 @@ export default {
     }
     textarea {
         resize: none;
+    }
+    .modal-background{
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #0000007e;
+    }
+    .modal-editor{
+        background: #74ff34;
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 19%;
+        padding: 20px;
     }
     .memo-inputs{
         display: flex;
