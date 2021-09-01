@@ -5,7 +5,7 @@
             <div class="container memo-inputs"> 
 
 
-                    <input type="text" name="Memo title"  placeholder="Title" maxlength="27" v-model="writeMemo">
+                     <input type="text" name="Memo title"  placeholder="Title" maxlength="27" v-model="writeMemo"> 
                     <textarea cols="25" rows="5" placeholder="Body" maxlength="280" v-model="writeMemoBody"></textarea>  
                     <button @click="createMemit">MEM-it</button>
 
@@ -14,9 +14,9 @@
                         <div class="modal-background"></div>
                         <div class="modal-editor container">
                             <h1>Edit your MEMIT</h1>
-                            <input type="text" v-model="rewriteMemo">
-                            <textarea name="" id="" cols="25" rows="5" v-model="rewriteMemoBody"></textarea>
-                            <button @click="editMemit">MEM-dit</button>
+                            <input type="text" v-model="editedmemit.title">
+                            <textarea name="" id="" cols="25" rows="5" v-model="editedmemit.body"></textarea>
+                            <button @click="editMemit(editedmemit.id)">MEM-dit</button>
                             <button @click="modalFunction">Cancel</button>
                         </div>    
                     </div>   
@@ -33,13 +33,12 @@
         <div class="memits-container container">
             <div v-for="(memit) in memits" :key='memit.id' class="mem-it">
                 <div>
-               <h3>{{ memit.title }}</h3> 
-                <p>{{ memit.body }}</p>
-                <div class="button-position">
-                    <button @click="modalFunction(memits.id, memits.title, memits.body)" >Edit</button>
-                    <!-- <button @click="editMemit(memit.id, memit.title, memit.body)">Edit</button> -->
-                    <button @click.capture="deleteMemit(memit.id, memit.title)">X</button>
-                </div>
+                    <h3>{{ memit.title }}</h3> 
+                    <p>{{ memit.body }}</p>
+                    <div>
+                        <button @click="modalFunction(memit)" >Edit</button>
+                        <button @click.capture="deleteMemit(memit.id, memit.title)">X</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -57,14 +56,20 @@ export default {
         return{
             writeMemo: "",
             writeMemoBody: "",
-            rewriteMemo: "",
-            rewriteMemoBody: "",
             memits: [],
-            modal_directive: false
+            modal_directive: false,
+            editedmemit:{}
         }
     },
+    created(){
+                let saveMemit = JSON.parse(localStorage.getItem('all-memits'));
+                if(saveMemit === null){
+                    this.memits = [];
+                }else{
+                    this.memits = saveMemit;
+                }
+    },
     methods: {
-
         createMemit() {
             this.memits.push({
                 id: Math.random() + Math.random(),
@@ -75,57 +80,33 @@ export default {
             this.writeMemoBody='';
             localStorage.setItem('all-memits',JSON.stringify(this.memits));              
         },
+          modalFunction(objMemit){
+            this.modal_directive = !this.modal_directive
+            this.editedmemit = {...objMemit}
+        },
         deleteMemit(id){
            let nodeletes = this.memits.filter(memit => memit.id != id);
-            localStorage.setItem('all-memits',JSON.stringify(nodeletes))
-            let saveMemit = JSON.parse(localStorage.getItem('all-memits'));
-                if(saveMemit === null){
-                    this.memits = [];
-                }else{
-                    this.memits = saveMemit;
-                }
-            },
-        editMemit(){
-            console.log("This edit the memit");
-            console.log('original memit: ', id , title, body);
-            let newarray = this.memits.map(memit => {
-                if(memit.id === id){
-                   return {
-                       id: memit.id,
-                       title: this.rewriteMemo,
-                       body:  this.rewriteMemoBody 
-                   }
+           this.memits = nodeletes;
+           localStorage.setItem('all-memits',JSON.stringify(nodeletes))
+        },
+        editMemit(id){
+            let edition = this.memits.map( memit => {
+                if (memit.id === id){
+                    return{
+                        id: memit.id,
+                        title: this.editedmemit.title,
+                        body: this.editedmemit.body
+                    }
                 }else{
                     return memit
-                }
+                } 
             })
-            this.rewriteMemo='';
-            this.rewriteMemoBody='';
-            console.log(newarray);
-            localStorage.setItem('all-memits',JSON.stringify(newarray))
-            let saveMemit = JSON.parse(localStorage.getItem('all-memits'));
-                if(saveMemit === null){
-                    this.memits = [];
-                }else{
-                    this.memits = saveMemit;
-                }
-                this.modalFunction()
-        },
-        modalFunction(id, title, body){
+            this.memits = edition
+            localStorage.setItem('all-memits', JSON.stringify(edition))
             this.modal_directive = !this.modal_directive
-            //setear parametros que me llegan de edit en un objeto apra luego utilizarla en editmemit()
-        }   
-
-    },
-    created(){
-                let saveMemit = JSON.parse(localStorage.getItem('all-memits'));
-                if(saveMemit === null){
-                    this.memits = [];
-                }else{
-                    this.memits = saveMemit;
-                }
+         },   
     }
-
+    
 }
 // METODO (Que debe ser función) created() se ejectua antes de que cargue el documento. donde deberiamos leer el local storage/coockies/etc 
 </script>
@@ -173,8 +154,5 @@ export default {
         flex-direction: column;
         max-width: 30%;
         gap: 10px;
-    }
-    
-    
-    
+    } 
 </style>
